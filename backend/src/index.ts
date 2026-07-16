@@ -26,7 +26,7 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors({ origin: '*', credentials: true }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -71,8 +71,17 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 // Start server
 const start = async () => {
   try {
+    const { execSync } = require('child_process');
+    execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
     await prisma.$connect();
     logger.info('Database connected');
+
+    // Serve frontend build in production
+    const frontendBuild = path.join(__dirname, '../../frontend/dist');
+    app.use(express.static(frontendBuild));
+    app.get('*', (_req, res) => {
+      res.sendFile(path.join(frontendBuild, 'index.html'));
+    });
 
     startScheduler();
 

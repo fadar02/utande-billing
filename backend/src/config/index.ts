@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const config = {
-  port: parseInt(process.env.APP_PORT || '3000', 10),
+  port: parseInt(process.env.PORT || process.env.APP_PORT || '3000', 10),
   appUrl: process.env.APP_URL || 'http://localhost:3000',
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback-secret',

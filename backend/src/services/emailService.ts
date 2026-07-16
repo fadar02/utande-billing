@@ -102,7 +102,7 @@ export const retryFailedEmails = async (): Promise<void> => {
 };
 
 // Email Templates
-const FRONTEND_URL = 'http://localhost:5174';
+const FRONTEND_URL = config.appUrl || 'http://localhost:3000';
 
 const logoImg = `<img src="${config.appUrl}/assets/logo.png" alt="Utande" style="height:80px;margin:0 auto 12px;display:block;" alt="Utande" style="height:56px;margin:0 auto 12px;display:block;" />`;
 
