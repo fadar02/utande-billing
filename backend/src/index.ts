@@ -24,7 +24,7 @@ import settingsRoutes from './routes/settingsRoutes';
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: '*', credentials: true }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 
@@ -62,6 +62,14 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
+// Serve frontend build in production
+const frontendBuild = path.join(__dirname, '../../frontend/dist');
+logger.info(`Serving frontend from: ${frontendBuild}`);
+app.use(express.static(frontendBuild));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendBuild, 'index.html'));
+});
+
 // Error handling middleware
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   logger.error(`Unhandled error: ${err.message}`, { stack: err.stack });
@@ -71,17 +79,16 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 // Start server
 const start = async () => {
   try {
-    const { execSync } = require('child_process');
-    execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
+    try {
+      const { execSync } = require('child_process');
+      execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
+      logger.info('Database schema synced');
+    } catch (e: any) {
+      logger.error(`prisma db push failed: ${e.message}`);
+    }
+
     await prisma.$connect();
     logger.info('Database connected');
-
-    // Serve frontend build in production
-    const frontendBuild = path.join(__dirname, '../../frontend/dist');
-    app.use(express.static(frontendBuild));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(frontendBuild, 'index.html'));
-    });
 
     startScheduler();
 
