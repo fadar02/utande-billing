@@ -10,5 +10,4 @@ frontend/node_modules/
 frontend/dist/
 .DS_Store
 backend/logs/
-*.db
-backend/*.db
+ekhaya-fc/
