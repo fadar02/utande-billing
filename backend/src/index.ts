@@ -81,7 +81,8 @@ const start = async () => {
   try {
     try {
       const { execSync } = require('child_process');
-      execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
+      const schemaPath = require('path').join(__dirname, '../prisma/schema.prisma');
+      execSync(`npx prisma db push --schema="${schemaPath}" --skip-generate --accept-data-loss`, { stdio: 'inherit', cwd: __dirname });
       logger.info('Database schema synced');
     } catch (e: any) {
       logger.error(`prisma db push failed: ${e.message}`);

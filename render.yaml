@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: utande-billing
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install && npx prisma generate && npx prisma db push --skip-generate --accept-data-loss && npx tsc && cd ../frontend && npm install && npm run build
+    startCommand: cd backend && node dist/index.js
+    envVars:
+      - key: DATABASE_URL
+        value: file:./prod.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        value: bwailacesc@gmail.com
+      - key: SMTP_PASS
+        sync: false
+        value: blkdxhcifzdichoq
+      - key: SMTP_FROM
+        value: "Utande Billing <bwailacesc@gmail.com>"
+      - key: APP_URL
+        value: https://utande-billing.onrender.com

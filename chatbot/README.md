@@ -34,20 +34,26 @@ An AI-powered business assistant for small and medium enterprises (SMEs).
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/kastart.git
-cd kastart
+git clone https://github.com/fadar02/KaStart-.git
+cd KaStart-
 
-# Install dependencies (optional - works without them)
+# Install dependencies
 pip install -r requirements.txt
 
-# Run the assistant
+# Run the web interface (recommended)
+streamlit run app.py
+
+# Or run terminal version
 python3 chatbot.py
 ```
 
 ## Quick Start
 
 ```bash
-# Start interactive session
+# Web Interface (ChatGPT-like UI)
+streamlit run app.py
+
+# Terminal Interface
 python3 chatbot.py
 
 # Run with a command
