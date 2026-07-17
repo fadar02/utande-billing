@@ -1,0 +1,22 @@
+{
+  "INV-0001": {
+    "id": "INV-0001",
+    "client": "acme corp",
+    "amount": 1500.0,
+    "due_date": "2026-02-15",
+    "description": "website development",
+    "status": "pending",
+    "created": "2026-07-17T05:24:57.395552",
+    "paid_date": null
+  },
+  "INV-0002": {
+    "id": "INV-0002",
+    "client": "acme corp",
+    "amount": 1500.0,
+    "due_date": "2026-02-15",
+    "description": "website development",
+    "status": "pending",
+    "created": "2026-07-17T05:25:05.799380",
+    "paid_date": null
+  }
+}

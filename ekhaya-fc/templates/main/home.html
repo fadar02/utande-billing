@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Ekhaya FC{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-3">Home is Where the Heart Is</h1>
+                <p class="lead mb-4">Ekhaya Football Club — Passion. Discipline. Unity.</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('main.fixtures') }}" class="btn btn-light btn-lg">View Fixtures</a>
+                    <a href="{{ url_for('main.players') }}" class="btn btn-outline-light btn-lg">Meet the Team</a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <i class="bi bi-shield-shaded display-1"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h2 class="fw-bold">{{ total_players if total_players is defined else '—' }}</h2>
+                <p class="mb-0 text-muted">Players</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h2 class="fw-bold">{{ league_position.position if league_position else '—' }}</h2>
+                <p class="mb-0 text-muted">League Position</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="fw-bold">12</h2>
+                <p class="mb-0 text-muted">Trophies</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Latest News</h2>
+            <a href="{{ url_for('main.news_list') }}" class="text-primary text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if latest_news %}
+        <div class="row g-4">
+            {% for item in latest_news %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    {% if item.image %}
+                    <img src="{{ url_for('static', filename='uploads/news/' + item.image) }}" class="card-img-top" alt="{{ item.title }}" style="height:200px; object-fit:cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height:200px;">
+                        <i class="bi bi-newspaper text-white display-4"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ item.title }}</h5>
+                        <p class="card-text text-muted flex-grow-1">{{ item.content[:150]|striptags }}{% if item.content|length > 150 %}...{% endif %}</p>
+                        <small class="text-muted mb-2">{{ item.created_at.strftime('%B %d, %Y') }}</small>
+                        <a href="{{ url_for('main.news_detail', id=item.id) }}" class="btn btn-outline-primary btn-sm mt-auto">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-newspaper display-1"></i>
+            <p class="mt-3">No news articles available at this time.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Upcoming Fixtures</h2>
+            <a href="{{ url_for('main.fixtures') }}" class="text-primary text-decoration-none">All Fixtures <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if upcoming_fixtures %}
+        <div class="table-responsive">
+            <table class="table table-hover bg-white shadow-sm">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Date</th>
+                        <th>Opponent</th>
+                        <th>Venue</th>
+                        <th>Home/Away</th>
+                        <th>Kick Off</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fixture in upcoming_fixtures %}
+                    <tr>
+                        <td>{{ fixture.match_date.strftime('%b %d, %Y') }}</td>
+                        <td class="fw-semibold">
+                            {% if fixture.match and fixture.match.opponent_logo %}
+                            <img src="{{ url_for('static', filename=fixture.match.opponent_logo) }}" alt="{{ fixture.opponent }}" style="width:24px; height:24px; object-fit:contain; margin-right:6px; vertical-align:middle;">
+                            {% endif %}
+                            {{ fixture.opponent }}
+                        </td>
+                        <td>{{ fixture.venue or 'TBD' }}</td>
+                        <td>
+                            {% if fixture.home_away|lower == 'home' %}
+                            <span class="badge bg-success">Home</span>
+                            {% else %}
+                            <span class="badge bg-info">Away</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ fixture.kick_off_time.strftime('%H:%M') if fixture.kick_off_time else 'TBD' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-calendar-x display-1"></i>
+            <p class="mt-3">No upcoming fixtures scheduled.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Latest Results</h2>
+            <a href="{{ url_for('main.results') }}" class="text-primary text-decoration-none">All Results <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if latest_results %}
+        <div class="row g-4">
+            {% for result in latest_results %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">{{ result.match.match_date.strftime('%b %d, %Y') if result.match else '' }}</h6>
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
+                            <div>
+                                <img src="{{ url_for('static', filename='images/logos/ekhaya-fc.png') }}" alt="Ekhaya FC" style="width:40px; height:40px; object-fit:contain; margin-bottom:4px;">
+                                <h6 class="mb-0">Ekhaya FC</h6>
+                                <span class="display-6 fw-bold text-primary">{{ result.home_score }}</span>
+                            </div>
+                            <span class="fs-3 text-muted">-</span>
+                            <div>
+                                {% if result.match and result.match.opponent_logo %}
+                                <img src="{{ url_for('static', filename=result.match.opponent_logo) }}" alt="{{ result.match.opponent }}" style="width:40px; height:40px; object-fit:contain; margin-bottom:4px;">
+                                {% endif %}
+                                <h6 class="mb-0">{{ result.match.opponent if result.match else 'TBD' }}</h6>
+                                <span class="display-6 fw-bold text-primary">{{ result.away_score }}</span>
+                            </div>
+                        </div>
+                        {% if result.goal_scorers %}
+                        <p class="small text-muted mb-0"><i class="bi bi-circle-fill text-success"></i> {{ result.goal_scorers }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-trophy display-1"></i>
+            <p class="mt-3">No results available yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Featured Players</h2>
+            <a href="{{ url_for('main.players') }}" class="text-primary text-decoration-none">Full Squad <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if featured_players %}
+        <div class="row g-4">
+            {% for player in featured_players %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{{ url_for('main.player_detail', id=player.id) }}" class="text-decoration-none">
+                    <div class="card shadow-sm text-center h-100 border-0">
+                        <div class="position-relative">
+                            {% if player.photo %}
+                            <img src="{{ url_for('static', filename='uploads/players/' + player.photo) }}" class="card-img-top" alt="{{ player.full_name }}" style="height:200px; object-fit:cover;">
+                            {% else %}
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height:200px;">
+                                <i class="bi bi-person-fill text-white display-3"></i>
+                            </div>
+                            {% endif %}
+                            <span class="position-absolute top-0 end-0 badge bg-primary m-2 fs-6">#{{ player.jersey_number }}</span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title fw-bold text-dark mb-1">{{ player.full_name }}</h6>
+                            <small class="text-muted">{{ player.position }}</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-people display-1"></i>
+            <p class="mt-3">No featured players at this time.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Join the Ekhaya Family</h2>
+        <p class="lead mb-4">Support your club, stay updated, and be part of something bigger.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('main.contact') }}" class="btn btn-light btn-lg">Get in Touch</a>
+            <a href="{{ url_for('main.gallery') }}" class="btn btn-outline-light btn-lg">Gallery</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

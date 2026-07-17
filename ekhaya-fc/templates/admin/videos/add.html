@@ -1,0 +1,55 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Add Video - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-play-circle me-2"></i>Add Video</h2>
+    <a href="{{ url_for('admin_videos.list_videos') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Videos
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" required placeholder="e.g. Match Highlights: Ekhaya vs Wanderers">
+            </div>
+
+            <div class="mb-3">
+                <label for="video_url" class="form-label">Video URL <span class="text-danger">*</span></label>
+                <input type="url" class="form-control" id="video_url" name="video_url" required placeholder="YouTube: https://www.youtube.com/watch?v=... or Facebook: https://www.facebook.com/...">
+                <small class="text-muted">Paste a YouTube or Facebook video URL. It will be embedded automatically.</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" id="category" name="category">
+                    <option value="match_highlight">Match Highlight</option>
+                    <option value="interview">Interview</option>
+                    <option value="training">Training</option>
+                    <option value="behind_scenes">Behind the Scenes</option>
+                    <option value="press_conference">Press Conference</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Brief description of the video..."></textarea>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="is_published" name="is_published" value="1" checked>
+                <label class="form-check-label" for="is_published">Publish immediately</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg me-1"></i>Add Video
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{
+  "user_id": "default",
+  "topic": "general",
+  "date": "2026-07-17T05:25:05.800593",
+  "message_count": 2,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Add invoice: Acme Corp, $1500, 2026-02-15, Website development"
+    },
+    {
+      "role": "assistant",
+      "content": "Invoice Created\n  ID: INV-0002\n  Client: acme corp\n  Amount: $1,500.00\n  Due: 2026-02-15\n  Description: website development"
+    }
+  ]
+}

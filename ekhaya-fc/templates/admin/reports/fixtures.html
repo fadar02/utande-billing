@@ -1,0 +1,62 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Fixture Report - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Fixture Report</h4>
+    <div>
+        <a href="{{ url_for('reports.generate_report_pdf', report_type='fixtures') }}" class="btn btn-danger me-2">
+            <i class="bi bi-file-pdf me-1"></i>Download PDF
+        </a>
+        <a href="{{ url_for('reports.player_reports') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Reports
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Opponent</th>
+                        <th>Competition</th>
+                        <th>Venue</th>
+                        <th>Home/Away</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fixture in fixtures %}
+                    <tr>
+                        <td>{{ fixture.match_date.strftime('%b %d, %Y') }}</td>
+                        <td>{{ fixture.opponent }}</td>
+                        <td>{{ fixture.competition }}</td>
+                        <td>{{ fixture.venue or '-' }}</td>
+                        <td>{{ fixture.home_away.title() if fixture.home_away == fixture.home_away.lower() else fixture.home_away }}</td>
+                        <td>
+                            {% if fixture.match_status.value == 'upcoming' %}
+                            <span class="badge bg-primary">Upcoming</span>
+                            {% elif fixture.match_status.value == 'in_progress' %}
+                            <span class="badge bg-warning text-dark">In Progress</span>
+                            {% elif fixture.match_status.value == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% elif fixture.match_status.value == 'cancelled' %}
+                            <span class="badge bg-secondary">Cancelled</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No fixtures found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

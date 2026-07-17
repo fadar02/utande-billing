@@ -165,58 +165,48 @@ export const emailTemplates = {
     daysOverdue?: number
   ) => {
     const isUrgent = reminderType === 'overdue';
-    const headerColor = isUrgent ? '#1a2332' : '#1a2332';
     const title = isUrgent ? 'Overdue Payment Notice' : 'Payment Reminder';
+    const balanceAmount = balance || amount;
 
-    const daysInfo = isUrgent && daysOverdue ? `<div style="background:#fff5f5;border-left:4px solid #e53e3e;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0;">
-      <p style="color:#742a2a;font-size:14px;margin:0;font-weight:600;">This invoice is ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue</p>
-    </div>` : '';
+    const daysInfo = isUrgent && daysOverdue ? `<p style="color:#e53e3e;font-size:14px;font-weight:600;margin:0 0 16px;">This invoice is ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue</p>` : '';
 
-    const balanceInfo = balance ? `<div style="background:#ebf4ff;border-left:4px solid #3182ce;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0;">
-      <p style="color:#2c5282;font-size:14px;margin:0;"><strong>Outstanding Balance:</strong> MWK ${balance}</p>
-    </div>` : '';
-
-    let itemsTable = '';
+    let itemsList = '';
     if (items && items.length > 0) {
-      itemsTable = `
-        <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;">
-          <tr style="background:#f7fafc;">
-            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:left;">Description</th>
-            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">Qty</th>
-            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:right;">Unit Price</th>
-            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:right;">Amount</th>
-          </tr>
-          ${items.map(item => `
-          <tr>
-            <td style="padding:8px 12px;border:1px solid #e2e8f0;">${item.description}</td>
-            <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">${item.quantity}</td>
-            <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:right;">MWK ${item.unitPrice.toFixed(2)}</td>
-            <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:right;">MWK ${item.amount.toFixed(2)}</td>
-          </tr>`).join('')}
-          <tr style="background:#f7fafc;">
-            <td colspan="3" style="padding:10px 12px;border:1px solid #e2e8f0;text-align:right;font-weight:600;">Total</td>
-            <td style="padding:10px 12px;border:1px solid #e2e8f0;text-align:right;font-weight:700;color:#e53e3e;">MWK ${amount}</td>
-          </tr>
-        </table>`;
+      itemsList = items.map(item =>
+        `<tr>
+          <td style="padding:8px 12px;border:1px solid #e2e8f0;">${item.description}</td>
+          <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">${item.quantity}</td>
+          <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:right;">MWK ${item.amount.toFixed(2)}</td>
+        </tr>`
+      ).join('');
     }
 
     return {
       subject: isUrgent
-        ? `OVERDUE: Invoice ${invoiceNumber} — MWK ${balance || amount} now past due`
-        : `Payment Reminder: Invoice ${invoiceNumber} — MWK ${balance || amount}`,
-      html: baseWrapper(headerColor, title, `
-        <p style="color:#2d3748;font-size:14px;margin:0 0 16px;">Dear ${customerName},</p>
-        <p style="color:#4a5568;font-size:14px;margin:0 0 16px;">We hope this message finds you well. We would like to bring to your attention that your payment for the following invoice is <strong style="color:${isUrgent ? '#e53e3e' : '#1a2332'};">${reminderType}</strong>.</p>
-        ${serviceName ? `<p style="color:#4a5568;font-size:14px;margin:0 0 8px;"><strong>Service:</strong> ${serviceName}</p>` : ''}
-        ${invoiceSummary(invoiceNumber, balance || amount, dueDate)}
+        ? `OVERDUE: Invoice ${invoiceNumber} — MWK ${balanceAmount}`
+        : `Payment Reminder: Invoice ${invoiceNumber} — MWK ${balanceAmount}`,
+      html: baseWrapper('#1a2332', title, `
+        <p style="color:#2d3748;font-size:14px;margin:0 0 12px;">Dear ${customerName},</p>
+        <p style="color:#4a5568;font-size:14px;margin:0 0 16px;">This is a reminder that your payment is <strong style="color:${isUrgent ? '#e53e3e' : '#1a2332'};">${reminderType}</strong>.</p>
         ${daysInfo}
-        ${balanceInfo}
-        ${itemsTable}
-        <div style="background:#ebf4ff;border-left:4px solid #3182ce;padding:12px 16px;margin:16px 0;border-radius:0 6px 6px 0;">
-          <p style="color:#2c5282;font-size:13px;margin:0;">We kindly request that you settle this outstanding balance at your earliest convenience to ensure uninterrupted service.</p>
-        </div>
-        ${isUrgent ? '<p style="color:#e53e3e;font-size:13px;font-weight:600;margin:12px 0 0;">Please note that continued non-payment may result in temporary suspension of services.</p>' : ''}
-        <p style="color:#718096;font-size:12px;margin:16px 0 0;">Should you have already made this payment, please disregard this notice. For any questions or concerns, feel free to reach out to our billing support team.</p>
+        <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+          <tr><td style="padding:10px 12px;background:#f7fafc;border:1px solid #e2e8f0;width:40%;color:#4a5568;font-weight:500;">Invoice</td><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600;">${invoiceNumber}</td></tr>
+          <tr><td style="padding:10px 12px;background:#f7fafc;border:1px solid #e2e8f0;color:#4a5568;font-weight:500;">Amount Due</td><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:700;color:#e53e3e;">MWK ${balanceAmount}</td></tr>
+          <tr><td style="padding:10px 12px;background:#f7fafc;border:1px solid #e2e8f0;color:#4a5568;font-weight:500;">Due Date</td><td style="padding:10px 12px;border:1px solid #e2e8f0;">${dueDate}</td></tr>
+        </table>
+        ${itemsList ? `<table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;">
+          <tr style="background:#f7fafc;">
+            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:left;">Description</th>
+            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">Qty</th>
+            <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:right;">Amount</th>
+          </tr>
+          ${itemsList}
+          <tr style="background:#f7fafc;">
+            <td colspan="2" style="padding:10px 12px;border:1px solid #e2e8f0;text-align:right;font-weight:600;">Total</td>
+            <td style="padding:10px 12px;border:1px solid #e2e8f0;text-align:right;font-weight:700;color:#e53e3e;">MWK ${balanceAmount}</td>
+          </tr>
+        </table>` : ''}
+        ${isUrgent ? '<p style="color:#e53e3e;font-size:13px;font-weight:600;margin:16px 0 0;">Continued non-payment may result in service suspension.</p>' : ''}
       `),
     };
   },

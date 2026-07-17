@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Edit Article - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Edit Article</h4>
+    <a href="{{ url_for('news.list_news') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to News
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form action="{{ url_for('news.edit_article', id=article.id) }}" method="POST" enctype="multipart/form-data">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ article.title }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="author" class="form-label">Author <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="author" name="author" value="{{ article.author }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">Select Category</option>
+                        <option value="match_preview" {% if article.category and article.category.value == 'match_preview' %}selected{% endif %}>Match Preview</option>
+                        <option value="match_report" {% if article.category and article.category.value == 'match_report' %}selected{% endif %}>Match Report</option>
+                        <option value="player_interview" {% if article.category and article.category.value == 'player_interview' %}selected{% endif %}>Player Interview</option>
+                        <option value="club_announcement" {% if article.category and article.category.value == 'club_announcement' %}selected{% endif %}>Club Announcement</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="content" class="form-label">Content <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="content" name="content" rows="10" required>{{ article.content }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="image" class="form-label">Image</label>
+                    {% if article.image %}
+                    <div class="mb-2">
+                        <img src="{{ url_for('static', filename='uploads/news/' + article.image) }}" alt="{{ article.title }}" class="rounded" height="80">
+                    </div>
+                    {% endif %}
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="is_published" name="is_published" {% if article.is_published %}checked{% endif %}>
+                        <label class="form-check-label" for="is_published">Published</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>Update Article
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

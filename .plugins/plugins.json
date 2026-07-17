@@ -1,0 +1,20 @@
+{
+  "calculator": {
+    "enabled": true
+  },
+  "weather": {
+    "enabled": true
+  },
+  "translator": {
+    "enabled": true
+  },
+  "summarizer": {
+    "enabled": true
+  },
+  "email_composer": {
+    "enabled": true
+  },
+  "report_generator": {
+    "enabled": true
+  }
+}

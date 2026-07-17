@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}{{ player.full_name }} - Ekhaya FC{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-3">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.players') }}" class="text-white-50">Players</a></li>
+                <li class="breadcrumb-item text-white active">{{ player.full_name }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5 text-center">
+                <div class="position-relative d-inline-block">
+                    {% if player.photo %}
+                    <img src="{{ url_for('static', filename='uploads/players/' + player.photo) }}" class="img-fluid rounded shadow" alt="{{ player.full_name }}" style="max-height:450px; object-fit:cover;">
+                    {% else %}
+                    <div class="bg-secondary d-inline-flex align-items-center justify-content-center rounded shadow" style="width:350px; height:450px;">
+                        <i class="bi bi-person-fill text-white" style="font-size:8rem;"></i>
+                    </div>
+                    {% endif %}
+                    <span class="position-absolute top-0 start-0 badge bg-primary fs-3 px-3 py-2 m-3">#{{ player.jersey_number }}</span>
+                </div>
+
+                <div class="mt-4">
+                    {% set status = player.status.value %}
+                    {% if status == 'active' %}
+                    <span class="badge bg-success fs-6">Active</span>
+                    {% elif status == 'injured' %}
+                    <span class="badge bg-warning text-dark fs-6">Injured</span>
+                    {% elif status == 'suspended' %}
+                    <span class="badge bg-danger fs-6">Suspended</span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6">{{ status|capitalize }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <h1 class="fw-bold mb-1">{{ player.full_name }}</h1>
+                <p class="text-primary fs-4 mb-4">{{ player.position }}</p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-calendar3 text-primary fs-4"></i>
+                                <h6 class="mt-2 mb-0">Date of Birth</h6>
+                                <p class="mb-0 fw-semibold">{{ player.date_of_birth.strftime('%B %d, %Y') if player.date_of_birth else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-globe text-primary fs-4"></i>
+                                <h6 class="mt-2 mb-0">Nationality</h6>
+                                <p class="mb-0 fw-semibold">{{ player.nationality or 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-rulers text-primary fs-4"></i>
+                                <h6 class="mt-2 mb-0">Height</h6>
+                                <p class="mb-0 fw-semibold">{{ '%.0f cm'|format(player.height) if player.height else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body text-center">
+                                <i class="bi bi-speedometer text-primary fs-4"></i>
+                                <h6 class="mt-2 mb-0">Weight</h6>
+                                <p class="mb-0 fw-semibold">{{ '%.0f kg'|format(player.weight) if player.weight else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-shield-check text-primary me-2"></i>Player Details</h5>
+                        <table class="table table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width:160px;">Jersey Number</td>
+                                <td class="fw-semibold">#{{ player.jersey_number }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Position</td>
+                                <td class="fw-semibold">{{ player.position }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Preferred Foot</td>
+                                <td class="fw-semibold">{{ player.preferred_foot or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Status</td>
+                                <td class="fw-semibold">{{ player.status.value|capitalize }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card border-0 bg-light mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart text-primary me-2"></i>Season Statistics</h5>
+                        <div class="row text-center g-3">
+                            <div class="col-4">
+                                <h4 class="mb-0 text-primary">{{ player.appearances }}</h4>
+                                <small class="text-muted">Appearances</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 text-success">{{ player.goals }}</h4>
+                                <small class="text-muted">Goals</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 text-info">{{ player.assists }}</h4>
+                                <small class="text-muted">Assists</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 text-warning">{{ player.yellow_cards }}</h4>
+                                <small class="text-muted">Yellow Cards</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 text-danger">{{ player.red_cards }}</h4>
+                                <small class="text-muted">Red Cards</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 text-dark">{{ player.minutes_played }}'</h4>
+                                <small class="text-muted">Minutes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if player.phone or player.email or player.emergency_contact %}
+                <div class="card border-0 bg-light mt-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-envelope text-primary me-2"></i>Contact Information</h5>
+                        <ul class="list-unstyled mb-0">
+                            {% if player.phone %}
+                            <li class="mb-2"><i class="bi bi-telephone me-2 text-muted"></i>{{ player.phone }}</li>
+                            {% endif %}
+                            {% if player.email %}
+                            <li class="mb-2"><i class="bi bi-envelope me-2 text-muted"></i>{{ player.email }}</li>
+                            {% endif %}
+                            {% if player.emergency_contact %}
+                            <li><i class="bi bi-heart-pulse me-2 text-danger"></i><strong>Emergency:</strong> {{ player.emergency_contact }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Add Transaction - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Add Transaction</h4>
+    <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Transactions
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form action="{{ url_for('transactions.add_transaction') }}" method="POST">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="description" name="description" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="amount" class="form-label">Amount (MWK) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="type" class="form-label">Type <span class="text-danger">*</span></label>
+                    <select class="form-select" id="type" name="type" required>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">Select Category</option>
+                        <option value="Sponsorship">Sponsorship</option>
+                        <option value="Gate Revenue">Gate Revenue</option>
+                        <option value="Merchandise">Merchandise</option>
+                        <option value="Donation">Donation</option>
+                        <option value="Player Wages">Player Wages</option>
+                        <option value="Staff Wages">Staff Wages</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Equipment">Equipment</option>
+                        <option value="Facility">Facility</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="transaction_date" class="form-label">Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="transaction_date" name="transaction_date" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="reference" class="form-label">Reference</label>
+                    <input type="text" class="form-control" id="reference" name="reference" placeholder="e.g. Invoice #, Receipt #">
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>Add Transaction
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

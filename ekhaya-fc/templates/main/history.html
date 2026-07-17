@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Club History - Ekhaya FC{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5">
+    <div class="container py-3">
+        <h1 class="fw-bold">Club History</h1>
+        <p class="lead mb-0">The journey of Ekhaya FC from humble beginnings to greatness.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="era-section mb-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <span class="badge bg-primary fs-5 me-3 px-3 py-2">2009 — 2011</span>
+                        <h2 class="fw-bold mb-0">The Founding Era</h2>
+                    </div>
+                    <div class="ps-4 border-start border-3 border-primary">
+                        <p class="lead">Every great story has a beginning. Ours started with a ball, a field, and a group of friends.</p>
+                        <p>In 2009, Ekhaya Football Club was born out of a passion for football in the local community. A small group of players, united by their love for the beautiful game, decided to form a club that would represent their neighbourhood with pride.</p>
+                        <p>The early years were characterised by grassroots football — playing on dusty fields with makeshift goals. But the spirit was there. The team quickly gained a reputation for attractive football and fierce determination.</p>
+                        <p>By 2011, Ekhaya FC had earned promotion to a higher division, signalling the start of something special. The foundation was laid for what was to come.</p>
+                    </div>
+                </div>
+
+                <div class="era-section mb-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <span class="badge bg-success fs-5 me-3 px-3 py-2">2012 — 2015</span>
+                        <h2 class="fw-bold mb-0">The Rise to Prominence</h2>
+                    </div>
+                    <div class="ps-4 border-start border-3 border-success">
+                        <p class="lead">From underdogs to champions — the era that defined our identity.</p>
+                        <p>2012 marked a watershed moment. In just their fourth season, Ekhaya FC won their first league title, stunning the football fraternity. The squad, built on a mix of experienced players and emerging youth, played with an intensity that opponents simply could not match.</p>
+                        <p>The following years saw continued competitiveness, with consecutive top-three finishes. In 2015, the club made a landmark decision to launch its youth academy, ensuring a pipeline of talent for years to come.</p>
+                        <p>This era cemented Ekhaya FC's reputation as a club on the rise, built on solid foundations and a clear philosophy.</p>
+                    </div>
+                </div>
+
+                <div class="era-section mb-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <span class="badge bg-warning text-dark fs-5 me-3 px-3 py-2">2016 — 2019</span>
+                        <h2 class="fw-bold mb-0">The Golden Age</h2>
+                    </div>
+                    <div class="ps-4 border-start border-3 border-warning">
+                        <p class="lead">Trophies, records, and unforgettable moments on the continental stage.</p>
+                        <p>This period represents the most successful chapter in the club's history. Multiple league titles, cup victories, and a reputation for playing some of the most exciting football in the league.</p>
+                        <p>The 2018 season was particularly memorable — a cup double that showcased the squad's depth and quality. Ekhaya FC became the team everyone wanted to beat, and the team that everyone admired.</p>
+                        <p>Several academy graduates broke into the first team during this era, proving the youth development programme was delivering on its promise. The club also began to gain recognition beyond national borders.</p>
+                    </div>
+                </div>
+
+                <div class="era-section mb-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <span class="badge bg-info fs-5 me-3 px-3 py-2">2020 — Present</span>
+                        <h2 class="fw-bold mb-0">The Modern Era</h2>
+                    </div>
+                    <div class="ps-4 border-start border-3 border-info">
+                        <p class="lead">New horizons, new ambitions, and a commitment to sustainable success.</p>
+                        <p>Like all clubs, Ekhaya FC faced unprecedented challenges during the global pandemic period, but emerged stronger and more united. The club used this time to invest in infrastructure, including the construction of a new home ground completed in 2022.</p>
+                        <p>The modern era is characterised by a professional approach to every aspect of club operations — from scouting and recruitment to sports science and commercial development.</p>
+                        <p>Today, Ekhaya FC competes at the highest level, with ambitions that extend to continental competition. The journey from dusty fields to modern stadiums is a story of vision, hard work, and an unwavering belief in the Ekhaya way.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">The Story Continues</h2>
+        <p class="lead text-muted mb-4">Every match writes a new chapter. Every season brings new dreams.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('main.fixtures') }}" class="btn btn-primary btn-lg">View Fixtures</a>
+            <a href="{{ url_for('main.players') }}" class="btn btn-outline-primary btn-lg">Meet the Squad</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

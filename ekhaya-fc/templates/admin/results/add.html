@@ -1,0 +1,59 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Add Result - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Add Result</h4>
+    <a href="{{ url_for('results.list_results') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Results
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form action="{{ url_for('results.add_result') }}" method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="match_id" class="form-label">Match <span class="text-danger">*</span></label>
+                    <select class="form-select" id="match_id" name="match_id" required>
+                        <option value="">Select Match</option>
+                        {% for m in matches %}
+                        <option value="{{ m.id }}">{{ m.opponent }} - {{ m.match_date.strftime('%b %d, %Y') }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="home_score" class="form-label">Home Score <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="home_score" name="home_score" min="0" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="away_score" class="form-label">Away Score <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="away_score" name="away_score" min="0" required>
+                </div>
+                <div class="col-12">
+                    <label for="goal_scorers" class="form-label">Goal Scorers</label>
+                    <textarea class="form-control" id="goal_scorers" name="goal_scorers" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="yellow_cards" class="form-label">Yellow Cards</label>
+                    <textarea class="form-control" id="yellow_cards" name="yellow_cards" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="red_cards" class="form-label">Red Cards</label>
+                    <textarea class="form-control" id="red_cards" name="red_cards" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label for="match_summary" class="form-label">Match Summary</label>
+                    <textarea class="form-control" id="match_summary" name="match_summary" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>Add Result
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

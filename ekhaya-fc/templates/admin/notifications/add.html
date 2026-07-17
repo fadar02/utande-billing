@@ -1,0 +1,47 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Create Notification - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Create Notification</h4>
+    <a href="{{ url_for('notifications.list_notifications') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Notifications
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form action="{{ url_for('notifications.add_notification') }}" method="POST">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="type" class="form-label">Type <span class="text-danger">*</span></label>
+                    <select class="form-select" id="type" name="type" required>
+                        <option value="match_tomorrow">Match Tomorrow</option>
+                        <option value="training_today">Training Today</option>
+                        <option value="club_announcement">Club Announcement</option>
+                        <option value="player_birthday">Player Birthday</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="link" class="form-label">Link (optional)</label>
+                    <input type="text" class="form-control" id="link" name="link" placeholder="e.g. /fixtures/1">
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-bell me-1"></i>Create Notification
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

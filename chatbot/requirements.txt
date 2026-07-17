@@ -1,0 +1,15 @@
+# KaStart AI Assistant
+# Core dependencies (optional - the assistant works without them)
+
+# Voice support (optional)
+# pyttsx3>=2.90
+# SpeechRecognition>=3.10.0
+
+# PDF processing (optional)
+# PyPDF2>=3.0.0
+
+# Image processing (optional)
+# Pillow>=9.0.0
+
+# Note: KaStart works without these packages
+# They provide enhanced functionality when installed

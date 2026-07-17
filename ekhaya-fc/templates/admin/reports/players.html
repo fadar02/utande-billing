@@ -1,0 +1,66 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Player Report - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Player Report</h4>
+    <div>
+        <a href="{{ url_for('reports.generate_report_pdf', report_type='players') }}" class="btn btn-danger me-2">
+            <i class="bi bi-file-pdf me-1"></i>Download PDF
+        </a>
+        <a href="{{ url_for('reports.player_reports') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Reports
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Nationality</th>
+                        <th>Status</th>
+                        <th>DOB</th>
+                        <th>Height</th>
+                        <th>Weight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr>
+                        <td>{{ player.jersey_number }}</td>
+                        <td>{{ player.full_name }}</td>
+                        <td>{{ player.position }}</td>
+                        <td>{{ player.nationality or '-' }}</td>
+                        <td>
+                            {% if player.status.value == 'active' %}
+                            <span class="badge bg-success">Active</span>
+                            {% elif player.status.value == 'injured' %}
+                            <span class="badge bg-warning text-dark">Injured</span>
+                            {% elif player.status.value == 'suspended' %}
+                            <span class="badge bg-danger">Suspended</span>
+                            {% elif player.status.value == 'inactive' %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ player.date_of_birth.strftime('%b %d, %Y') if player.date_of_birth else '-' }}</td>
+                        <td>{{ player.height|string + ' cm' if player.height else '-' }}</td>
+                        <td>{{ player.weight|string + ' kg' if player.weight else '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No players found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

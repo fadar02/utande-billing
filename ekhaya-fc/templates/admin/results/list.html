@@ -1,0 +1,54 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Manage Results - Ekhaya FC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Results</h4>
+    <a href="{{ url_for('results.add_result') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Result
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Match</th>
+                        <th>Score</th>
+                        <th>Goal Scorers</th>
+                        <th>Summary</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.match.opponent }} ({{ result.match.match_date.strftime('%b %d, %Y') }})</td>
+                        <td><strong>{{ result.home_score }} - {{ result.away_score }}</strong></td>
+                        <td>{{ result.goal_scorers or '-' }}</td>
+                        <td>{{ (result.match_summary[:80] + '...') if result.match_summary and result.match_summary|length > 80 else (result.match_summary or '-') }}</td>
+                        <td>
+                            <a href="{{ url_for('results.edit_result', id=result.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('results.delete_result', id=result.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this result?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No results found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+  "acme corp": {
+    "name": "acme corp",
+    "created": "2026-07-17T05:24:57.395213",
+    "invoices": [
+      "INV-0001",
+      "INV-0002"
+    ]
+  }
+}
