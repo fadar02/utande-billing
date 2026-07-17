@@ -1,0 +1,10 @@
+node_modules
+.git
+dist
+*.db
+.env
+.env.local
+backend/logs
+frontend/dist
+ekhaya-fc
+chatbot
