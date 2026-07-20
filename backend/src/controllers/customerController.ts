@@ -8,7 +8,7 @@ import logger from '../utils/logger';
 export class CustomerController {
   static async create(req: Request, res: Response) {
     try {
-      const { firstName, lastName, email, phone, notes } = req.body;
+      const { firstName, lastName, email, phone, notes, serviceIds } = req.body;
 
       const existingEmail = await prisma.customer.findUnique({ where: { email } });
       if (existingEmail) return res.status(400).json({ error: 'Email already registered' });
@@ -25,10 +25,25 @@ export class CustomerController {
       const customerCode = `CUST-${sequence.toString().padStart(5, '0')}`;
 
       const customer = await prisma.customer.create({
-        data: { customerCode, firstName, lastName, email, phone, notes },
+        data: {
+          customerCode, firstName, lastName, email, phone, notes,
+          ...(serviceIds?.length ? {
+            services: {
+              create: (serviceIds as string[]).map((serviceId: string) => ({
+                serviceId,
+                monthlyRate: 0,
+              })),
+            },
+          } : {}),
+        },
       });
 
-      res.status(201).json(customer);
+      const result = await prisma.customer.findUnique({
+        where: { id: customer.id },
+        include: { services: { include: { service: true } } },
+      });
+
+      res.status(201).json(result);
     } catch (error: any) {
       logger.error(`Create customer error: ${error.message}`);
       res.status(500).json({ error: 'Internal server error' });

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { customerAPI } from '../../services/api';
+import { customerAPI, serviceAPI } from '../../services/api';
 import { Card, Button, Input, Badge, Table, Modal } from '../../components/ui';
 import { useSettings } from '../../context/SettingsContext';
-import type { Customer } from '../../types';
+import type { Customer, Service } from '../../types';
 
 export const CustomersPage: React.FC = () => {
   const { formatMoney } = useSettings();
@@ -13,6 +13,8 @@ export const CustomersPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', notes: '' });
+  const [services, setServices] = useState<Service[]>([]);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
 
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailCustomer, setEmailCustomer] = useState<Customer | null>(null);
@@ -32,6 +34,10 @@ export const CustomersPage: React.FC = () => {
 
   useEffect(() => { loadCustomers(); }, [search, statusFilter]);
 
+  useEffect(() => {
+    serviceAPI.getAll().then(res => setServices(res.data)).catch(() => {});
+  }, []);
+
   const [formError, setFormError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,11 +47,12 @@ export const CustomersPage: React.FC = () => {
       if (editCustomer) {
         await customerAPI.update(editCustomer.id, form);
       } else {
-        await customerAPI.create(form);
+        await customerAPI.create({ ...form, serviceIds: selectedServiceIds });
       }
       setShowModal(false);
       setEditCustomer(null);
       setForm({ firstName: '', lastName: '', email: '', phone: '', notes: '' });
+      setSelectedServiceIds([]);
       loadCustomers();
     } catch (err: any) {
       setFormError(err.response?.data?.error || err.response?.data?.message || 'Failed to save customer');
@@ -55,6 +62,7 @@ export const CustomersPage: React.FC = () => {
   const handleEdit = (c: Customer) => {
     setEditCustomer(c);
     setForm({ firstName: c.firstName, lastName: c.lastName, email: c.email, phone: c.phone, notes: c.notes || '' });
+    setSelectedServiceIds(c.services?.map((cs: any) => cs.serviceId || cs.service?.id).filter(Boolean) || []);
     setShowModal(true);
   };
 
@@ -63,6 +71,12 @@ export const CustomersPage: React.FC = () => {
       await customerAPI.delete(id);
       loadCustomers();
     }
+  };
+
+  const toggleService = (serviceId: string) => {
+    setSelectedServiceIds(prev =>
+      prev.includes(serviceId) ? prev.filter(s => s !== serviceId) : [...prev, serviceId]
+    );
   };
 
   const openEmailModal = (c: Customer) => {
@@ -94,7 +108,7 @@ export const CustomersPage: React.FC = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
         <h1 style={{ margin: 0, color: '#2d3748' }}>Customers</h1>
-        <Button onClick={() => { setEditCustomer(null); setForm({ firstName: '', lastName: '', email: '', phone: '', notes: '' }); setShowModal(true); }}>
+        <Button onClick={() => { setEditCustomer(null); setForm({ firstName: '', lastName: '', email: '', phone: '', notes: '' }); setSelectedServiceIds([]); setShowModal(true); }}>
           + Add Customer
         </Button>
       </div>
@@ -221,6 +235,32 @@ export const CustomersPage: React.FC = () => {
           <Input label="Email" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
           <Input label="Phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
           <Input label="Notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+
+          {!editCustomer && services.length > 0 && (
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4a5568', fontWeight: 500 }}>
+                Packages & Services
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '8px', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+                {services.map(s => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => toggleService(s.id)}
+                    style={{
+                      padding: '6px 12px', borderRadius: '4px', border: '1px solid',
+                      cursor: 'pointer', fontSize: '13px',
+                      backgroundColor: selectedServiceIds.includes(s.id) ? '#3182ce' : '#fff',
+                      color: selectedServiceIds.includes(s.id) ? '#fff' : '#4a5568',
+                      borderColor: selectedServiceIds.includes(s.id) ? '#3182ce' : '#e2e8f0',
+                    }}
+                  >
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {formError && (
             <div style={{ padding: '10px', backgroundColor: '#fed7d7', color: '#742a2a', borderRadius: '6px', marginTop: '12px', fontSize: '13px' }}>
