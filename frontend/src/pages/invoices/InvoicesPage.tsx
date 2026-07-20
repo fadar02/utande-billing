@@ -84,11 +84,11 @@ export const InvoicesPage: React.FC = () => {
       const data = {
         customerId: form.customerId,
         customerServiceId: form.customerServiceId || undefined,
-        items: validItems.map(i => ({
-          description: i.description.trim(),
-          quantity: parseFloat(i.quantity) || 1,
-          unitPrice: parseFloat(i.unitPrice),
-        })),
+        items: validItems.map(i => {
+          const qty = parseFloat(i.quantity) || 1;
+          const price = parseFloat(i.unitPrice);
+          return { description: i.description.trim(), quantity: qty, unitPrice: price, amount: qty * price };
+        }),
         taxRate: parseFloat(form.taxRate) || 0,
         dueDate,
         description: form.description,
