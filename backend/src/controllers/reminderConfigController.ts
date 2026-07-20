@@ -59,4 +59,23 @@ export class ReminderConfigController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  static async sendManualReminder(req: AuthRequest, res: Response) {
+    try {
+      const { invoiceId, reminderType } = req.body;
+      if (!invoiceId) {
+        return res.status(400).json({ error: 'invoiceId is required' });
+      }
+      const type = reminderType || 'MANUAL';
+      const sent = await ReminderService.sendReminder(invoiceId, type);
+      if (sent) {
+        res.json({ message: 'Reminder sent successfully' });
+      } else {
+        res.status(400).json({ error: 'Failed to send reminder' });
+      }
+    } catch (error: any) {
+      logger.error(`Manual reminder error: ${error.message}`);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 }

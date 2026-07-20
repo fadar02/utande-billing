@@ -87,17 +87,18 @@ export class ServiceManagementService {
         },
       });
 
-      await sendEmail({
-        to: (await prisma.customer.findUnique({ where: { id: customerId } }))!.email,
-        ...emailTemplates.serviceRestored(
-          (await prisma.customer.findUnique({ where: { id: customerId } }))!.firstName +
-          ' ' +
-          (await prisma.customer.findUnique({ where: { id: customerId } }))!.lastName,
-          cs.service.name
-        ),
-        emailType: 'SERVICE_RESTORE',
-        relatedId: cs.id,
-      });
+      const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+      if (customer) {
+        await sendEmail({
+          to: customer.email,
+          ...emailTemplates.serviceRestored(
+            `${customer.firstName} ${customer.lastName}`,
+            cs.service.name
+          ),
+          emailType: 'SERVICE_RESTORE',
+          relatedId: cs.id,
+        });
+      }
 
       logger.info(`Restored service ${cs.service.name} for customer ${customerId}`);
     }

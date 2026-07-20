@@ -20,7 +20,9 @@ export const auditLog = async (
         userAgent: req.get('user-agent'),
       };
 
-      prisma.auditLog.create({ data: logData }).catch(console.error);
+      prisma.auditLog.create({ data: logData }).catch((err) => {
+        console.error('Audit log error:', err.message);
+      });
     }
     return originalJson(body);
   };

@@ -20,15 +20,17 @@ export const InvoicesPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const getDefaultDueDate = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 30);
+  const getDefaultInvoiceDate = () => new Date().toISOString().split('T')[0];
+  const calcDueDate = (invoiceDate: string, netDays: number) => {
+    const d = new Date(invoiceDate);
+    d.setDate(d.getDate() + netDays);
     return d.toISOString().split('T')[0];
   };
   const [form, setForm] = useState({
     customerId: '', customerServiceId: '', items: [{ description: '', quantity: '1', unitPrice: '' }], taxRate: '0',
-    dueDate: getDefaultDueDate(), description: '',
+    invoiceDate: getDefaultInvoiceDate(), netDays: '30', description: '',
   });
+  const dueDate = calcDueDate(form.invoiceDate, parseInt(form.netDays) || 30);
 
   const handleCustomerChange = async (customerId: string) => {
     if (!customerId) {
@@ -75,7 +77,7 @@ export const InvoicesPage: React.FC = () => {
     const validItems = form.items.filter(i => i.description.trim() && i.unitPrice && parseFloat(i.unitPrice) > 0);
 
     if (!form.customerId) { setError('Please select a customer'); return; }
-    if (!form.dueDate) { setError('Please select a due date'); return; }
+    if (!form.invoiceDate) { setError('Please select an invoice date'); return; }
     if (validItems.length === 0) { setError('Add at least one invoice item with a description and price'); return; }
 
     try {
@@ -88,13 +90,13 @@ export const InvoicesPage: React.FC = () => {
           unitPrice: parseFloat(i.unitPrice),
         })),
         taxRate: parseFloat(form.taxRate) || 0,
-        dueDate: form.dueDate,
+        dueDate,
         description: form.description,
       };
       await invoiceAPI.create(data);
       setShowCreateModal(false);
       setError('');
-      setForm({ customerId: '', customerServiceId: '', items: [{ description: '', quantity: '1', unitPrice: '' }], taxRate: '0', dueDate: getDefaultDueDate(), description: '' });
+      setForm({ ...form, customerId: '', customerServiceId: '', items: [{ description: '', quantity: '1', unitPrice: '' }], taxRate: '0', invoiceDate: getDefaultInvoiceDate(), netDays: '30', description: '' });
       loadInvoices();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to create invoice');
@@ -168,7 +170,24 @@ export const InvoicesPage: React.FC = () => {
         <form onSubmit={handleCreateInvoice}>
           <Select label="Customer" value={form.customerId} onChange={e => handleCustomerChange(e.target.value)} required
             options={[{ value: '', label: 'Select customer...' }, ...customers.map(c => ({ value: c.id, label: `${c.firstName} ${c.lastName} (${c.customerCode})` }))]} />
-          <Input label="Due Date" type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} required min="2024-01-01" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <Input label="Date" type="date" value={form.invoiceDate} onChange={e => setForm({ ...form, invoiceDate: e.target.value })} required />
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#374151' }}>Net</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <select value={form.netDays} onChange={e => setForm({ ...form, netDays: e.target.value })} style={{
+                  flex: 1, padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', backgroundColor: '#fff',
+                }}>
+                  <option value="15">Net 15</option>
+                  <option value="30">Net 30</option>
+                  <option value="45">Net 45</option>
+                  <option value="60">Net 60</option>
+                  <option value="90">Net 90</option>
+                </select>
+                <span style={{ color: '#718096', fontSize: '13px', whiteSpace: 'nowrap' }}>Due: {new Date(dueDate).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
           <Input label="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
           <Input label="Tax Rate (%)" type="number" value={form.taxRate} onChange={e => setForm({ ...form, taxRate: e.target.value })} />
 

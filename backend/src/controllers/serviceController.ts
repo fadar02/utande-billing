@@ -74,6 +74,9 @@ export class ServiceController {
       const service = await prisma.service.findUnique({ where: { id: serviceId } });
       if (!service) return res.status(404).json({ error: 'Service not found' });
 
+      const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+      if (!customer) return res.status(404).json({ error: 'Customer not found' });
+
       const customerService = await prisma.customerService.create({
         data: {
           customerId,

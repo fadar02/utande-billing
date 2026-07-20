@@ -2,9 +2,8 @@ import { Response } from 'express';
 import prisma from '../config/database';
 import { InvoiceService } from '../services/invoiceService';
 import { PDFService } from '../services/pdfService';
-import { sendEmail, emailTemplates } from '../services/emailService';
-import { ReminderService } from '../services/reminderService';
 import { AuthRequest } from '../middleware/auth';
+import { ReminderService } from '../services/reminderService';
 import logger from '../utils/logger';
 
 export class InvoiceController {
@@ -44,10 +43,11 @@ export class InvoiceController {
       if (status) where.status = status;
       if (customerId) where.customerId = customerId;
       if (search) {
+        const term = (search as string).toLowerCase();
         where.OR = [
-          { invoiceNumber: { contains: search as string, mode: 'insensitive' } },
-          { customer: { firstName: { contains: search as string, mode: 'insensitive' } } },
-          { customer: { lastName: { contains: search as string, mode: 'insensitive' } } },
+          { invoiceNumber: { contains: term } },
+          { customer: { firstName: { contains: term } } },
+          { customer: { lastName: { contains: term } } },
         ];
       }
 
@@ -61,11 +61,6 @@ export class InvoiceController {
         }),
         prisma.invoice.count({ where }),
       ]);
-
-      // Background: send reminders for due/overdue invoices
-      ReminderService.processAllDueReminders().catch((err: any) =>
-        logger.error(`Background overdue check error: ${err.message}`)
-      );
 
       res.json({
         invoices,

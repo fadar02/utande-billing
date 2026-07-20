@@ -34,6 +34,9 @@ const sections: Section[] = [
     description: 'Default currency and tax configuration for all invoices',
     settings: [
       { key: 'currency', label: 'Currency Code', type: 'select', options: [{ value: 'MWK', label: 'MWK — Malawian Kwacha' }] },
+      { key: 'currency_symbol', label: 'Currency Symbol', type: 'text' },
+      { key: 'tax_enabled', label: 'Enable Tax', type: 'toggle' },
+      { key: 'tax_rate', label: 'Tax Rate (%)', type: 'number' },
     ],
   },
   {
@@ -48,6 +51,7 @@ const sections: Section[] = [
       { key: 'auto_generate_invoices', label: 'Auto-Generate Monthly Invoices', type: 'toggle' },
       { key: 'auto_generate_day', label: 'Auto-Generate Day of Month', type: 'number' },
       { key: 'overdue_threshold_days', label: 'Overdue Threshold (days after due)', type: 'number' },
+      { key: 'overdue_reminder_interval_days', label: 'Overdue Reminder Interval (days)', type: 'number' },
     ],
   },
   {

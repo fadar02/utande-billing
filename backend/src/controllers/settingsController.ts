@@ -8,7 +8,7 @@ const DEFAULT_SETTINGS: { key: string; value: string; description: string }[] = 
   { key: 'company_phone', value: '', description: 'Company phone number' },
   { key: 'company_address', value: '', description: 'Company physical address' },
   { key: 'currency', value: 'MWK', description: 'Default currency code' },
-  { key: 'currency_symbol', value: '$', description: 'Currency symbol displayed on invoices' },
+  { key: 'currency_symbol', value: 'MWK', description: 'Currency symbol displayed on invoices' },
   { key: 'tax_rate', value: '0', description: 'Default tax rate percentage applied to invoices' },
   { key: 'tax_enabled', value: 'false', description: 'Whether tax is enabled on invoices' },
   { key: 'default_payment_terms', value: '30', description: 'Default days until invoice payment is due' },

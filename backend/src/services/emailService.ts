@@ -104,7 +104,18 @@ export const retryFailedEmails = async (): Promise<void> => {
 // Email Templates
 const FRONTEND_URL = config.appUrl || 'http://localhost:3000';
 
-const logoImg = `<img src="${config.appUrl}/assets/logo.png" alt="Utande" style="height:80px;margin:0 auto 12px;display:block;" alt="Utande" style="height:56px;margin:0 auto 12px;display:block;" />`;
+const logoBase64 = (() => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const logoPath = path.join(__dirname, '../../public/logo.png');
+    const data = fs.readFileSync(logoPath);
+    return `data:image/png;base64,${data.toString('base64')}`;
+  } catch {
+    return `${config.appUrl}/assets/logo.png`;
+  }
+})();
+const logoImg = `<img src="${logoBase64}" alt="Utande" style="height:80px;margin:0 auto 12px;display:block;" />`;
 
 const baseWrapper = (headerColor: string, headerTitle: string, content: string) => `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">

@@ -22,7 +22,8 @@ interface InvoiceData {
   balance: number;
 }
 
-const API = axios.create({ baseURL: 'http://localhost:3000/api/public' });
+const API_BASE = window.location.origin + '/api/public';
+const API = axios.create({ baseURL: API_BASE });
 
 export const PayInvoicePage: React.FC = () => {
   const { formatMoney } = useSettings();

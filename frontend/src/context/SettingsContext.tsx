@@ -15,9 +15,8 @@ const SYMBOL_MAP: Record<string, string> = {
 };
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currency, setCurrency] = useState('USD');
-  const [currencySymbol, setCurrencySymbol] = useState('$');
-  const [loaded, setLoaded] = useState(false);
+  const [currency, setCurrency] = useState('MWK');
+  const [currencySymbol, setCurrencySymbol] = useState('MWK');
 
   const load = async () => {
     try {
@@ -26,10 +25,9 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       const res = await settingsAPI.getAll();
       const map: Record<string, string> = {};
       res.data.forEach((s: any) => { map[s.key] = s.value; });
-      const cur = map.currency || 'USD';
+      const cur = map.currency || 'MWK';
       setCurrency(cur);
       setCurrencySymbol(SYMBOL_MAP[cur] || cur);
-      setLoaded(true);
     } catch {
       // Not logged in or error — use defaults
     }
@@ -37,11 +35,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   useEffect(() => {
     load();
-    const interval = setInterval(() => {
-      if (!loaded) load();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [loaded]);
+  }, []);
 
   const formatMoney = (amount: number | string): string => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;

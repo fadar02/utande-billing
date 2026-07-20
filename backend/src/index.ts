@@ -25,7 +25,7 @@ const app = express();
 
 // Security middleware
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors({ origin: '*', credentials: true }));
+app.use(cors({ origin: '*' }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 
 // Body parsing
@@ -62,6 +62,11 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
+// API 404 — must be before frontend catch-all
+app.use('/api', (_req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
+});
+
 // Serve frontend build in production
 const frontendBuild = path.join(__dirname, '../../frontend/dist');
 logger.info(`Serving frontend from: ${frontendBuild}`);
@@ -81,7 +86,7 @@ const start = async () => {
   try {
     try {
       const { execSync } = require('child_process');
-      const schemaPath = require('path').join(__dirname, '../prisma/schema.prisma');
+      const schemaPath = path.join(__dirname, '../prisma/schema.prisma');
       execSync(`npx prisma db push --schema="${schemaPath}" --skip-generate --accept-data-loss`, { stdio: 'inherit', cwd: __dirname });
       logger.info('Database schema synced');
     } catch (e: any) {

@@ -12,5 +12,6 @@ router.put('/config', ReminderConfigController.updateConfig);
 router.get('/history/:invoiceId', ReminderConfigController.getReminderHistory);
 router.get('/logs', ReminderConfigController.getAllLogs);
 router.post('/trigger', ReminderConfigController.triggerNow);
+router.post('/send', ReminderConfigController.sendManualReminder);
 
 export default router;

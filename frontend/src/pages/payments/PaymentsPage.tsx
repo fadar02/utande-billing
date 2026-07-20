@@ -24,7 +24,15 @@ export const PaymentsPage: React.FC = () => {
   useEffect(() => {
     loadPayments();
     Promise.all([
-      invoiceAPI.getAll({ status: 'PENDING' }).then(res => setInvoices(res.data.invoices)),
+      invoiceAPI.getAll({ status: 'PENDING' }).then(res => {
+        const pending = res.data.invoices;
+        Promise.all([
+          invoiceAPI.getAll({ status: 'OVERDUE' }).then(r => r.data.invoices),
+          invoiceAPI.getAll({ status: 'PARTIALLY_PAID' }).then(r => r.data.invoices),
+        ]).then(([overdue, partial]) => {
+          setInvoices([...pending, ...overdue, ...partial]);
+        }).catch(() => setInvoices(pending));
+      }),
       customerAPI.getAll().then(res => setCustomers(res.data.customers)),
     ]);
   }, []);

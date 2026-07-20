@@ -146,7 +146,7 @@ model Payment {
   paymentMethod   String    @map("payment_method")
   reference       String?
   notes           String?
-  receivedById    String    @map("received_by_id")
+  receivedById    String?   @map("received_by_id")
   paymentDate     DateTime  @default(now()) @map("payment_date")
   receiptSent     Boolean   @default(false) @map("receipt_sent")
   createdAt       DateTime  @default(now()) @map("created_at")
@@ -154,7 +154,7 @@ model Payment {
 
   customer        Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   invoice         Invoice?  @relation(fields: [invoiceId], references: [id])
-  receivedBy      User      @relation(fields: [receivedById], references: [id])
+  receivedBy      User?     @relation(fields: [receivedById], references: [id])
 
   @@index([customerId])
   @@index([invoiceId])

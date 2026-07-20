@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { AuthRequest } from '../middleware/auth';
 import { sendEmail } from '../services/emailService';
+import { config } from '../config';
 import logger from '../utils/logger';
 
 export class CustomerController {
@@ -44,12 +45,13 @@ export class CustomerController {
       const where: any = {};
       if (status) where.status = status;
       if (search) {
+        const term = (search as string).toLowerCase();
         where.OR = [
-          { firstName: { contains: search as string, mode: 'insensitive' } },
-          { lastName: { contains: search as string, mode: 'insensitive' } },
-          { email: { contains: search as string, mode: 'insensitive' } },
-          { customerCode: { contains: search as string, mode: 'insensitive' } },
-          { phone: { contains: search as string } },
+          { firstName: { contains: term } },
+          { lastName: { contains: term } },
+          { email: { contains: term } },
+          { customerCode: { contains: term } },
+          { phone: { contains: term } },
         ];
       }
 
@@ -59,7 +61,7 @@ export class CustomerController {
           include: {
             services: { where: { status: 'ACTIVE' }, include: { service: true } },
             invoices: {
-              where: { status: { in: ['PENDING', 'OVERDUE'] } },
+              where: { status: { in: ['PENDING', 'OVERDUE', 'PARTIALLY_PAID'] } },
               select: { total: true },
             },
             _count: { select: { invoices: true, payments: true } },
@@ -113,11 +115,11 @@ export class CustomerController {
   static async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { firstName, lastName, email, phone, status, notes } = req.body;
+      const { firstName, lastName, email, phone, status, notes, address, city, nationalId } = req.body;
 
       const customer = await prisma.customer.update({
         where: { id },
-        data: { firstName, lastName, email, phone, status, notes },
+        data: { firstName, lastName, email, phone, status, notes, address, city, nationalId },
       });
 
       res.json(customer);
@@ -181,7 +183,7 @@ export class CustomerController {
       const html = `
         <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
           <div style="background:#1a2332;padding:24px;text-align:center;">
-            <img src="http://localhost:3000/assets/logo.png" alt="Utande" style="height:48px;margin:0 auto 8px;display:block;" />
+            <img src="${config.appUrl}/assets/logo.png" alt="Utande" style="height:48px;margin:0 auto 8px;display:block;" />
             <div style="color:#ffffff;font-size:20px;font-weight:700;margin:0;">Utande Billing</div>
             <div style="color:#a0aec0;font-size:12px;margin:4px 0 0;">Smart Billing System</div>
           </div>

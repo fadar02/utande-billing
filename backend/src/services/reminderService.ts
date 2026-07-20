@@ -2,7 +2,10 @@ import prisma from '../config/database';
 import { sendEmail, emailTemplates } from './emailService';
 import logger from '../utils/logger';
 
-const ADMIN_EMAIL = 'admin@utande.com';
+const getAdminEmail = async (): Promise<string> => {
+  const setting = await prisma.systemSetting.findUnique({ where: { key: 'admin_email' } });
+  return setting?.value || 'admin@utande.com';
+};
 
 export class ReminderService {
   static async getReminderConfig() {
@@ -30,7 +33,7 @@ export class ReminderService {
   }
 
   static async shouldSendReminder(invoiceId: string, reminderType: string): Promise<boolean> {
-    if (reminderType.startsWith('OVERDUE_')) {
+    if (reminderType.startsWith('OVERDUE_') || reminderType === 'MANUAL') {
       return true;
     }
     const existingReminder = await prisma.reminderLog.findFirst({
@@ -73,6 +76,7 @@ export class ReminderService {
       THREE_DAYS_BEFORE: 'due in 3 days',
       ONE_DAY_BEFORE: 'due tomorrow',
       ON_DUE_DATE: 'due today',
+      MANUAL: 'payment reminder',
     };
     const label = reminderLabels[reminderType] || (reminderType.startsWith('OVERDUE') ? 'overdue' : reminderType.replace(/_/g, ' ').toLowerCase());
 
@@ -96,9 +100,10 @@ export class ReminderService {
       daysOverdue
     );
 
+    const adminEmail = await getAdminEmail();
     const sent = await sendEmail({
       to: invoice.customer.email,
-      cc: ADMIN_EMAIL,
+      cc: adminEmail,
       subject: template.subject,
       html: template.html,
       emailType: 'REMINDER',
@@ -151,9 +156,15 @@ export class ReminderService {
         // Overdue: send immediately when past due, then periodically
         if (config.overdueEnabled && diffDays < 0) {
           const daysOverdue = Math.abs(diffDays);
-          // Send on first day overdue, then every N days
-          if (daysOverdue === 1 || daysOverdue % config.overdueIntervalDays === 0) {
-            const reminderNumber = daysOverdue === 1 ? 1 : Math.floor(daysOverdue / config.overdueIntervalDays);
+          // Check last overdue reminder sent for this invoice
+          const lastOverdue = await prisma.reminderLog.findFirst({
+            where: { invoiceId: invoice.id, reminderType: { startsWith: 'OVERDUE_' }, status: { in: ['SENT', 'PENDING'] } },
+            orderBy: { createdAt: 'desc' },
+          });
+          const shouldSend = !lastOverdue || daysOverdue === 1 ||
+            (now.getTime() - new Date(lastOverdue.createdAt).getTime()) >= config.overdueIntervalDays * 24 * 60 * 60 * 1000;
+          if (shouldSend) {
+            const reminderNumber = lastOverdue ? parseInt(lastOverdue.reminderType.split('_')[1]) + 1 : 1;
             await this.sendReminder(invoice.id, `OVERDUE_${reminderNumber}`);
           }
         }
@@ -190,6 +201,8 @@ export class ReminderService {
           reminder.invoice.invoiceNumber,
           reminder.invoice.total.toString(),
           reminder.invoice.dueDate.toLocaleDateString(),
+          reminder.reminderType === 'MANUAL' ? 'payment reminder' :
+          reminder.reminderType.startsWith('OVERDUE') ? 'overdue' :
           reminder.reminderType.replace(/_/g, ' ').toLowerCase(),
           reminder.invoiceId,
           serviceName,
@@ -198,9 +211,10 @@ export class ReminderService {
           retryDaysOverdue
         );
 
+        const adminEmail = await getAdminEmail();
         const sent = await sendEmail({
           to: reminder.recipientEmail,
-          cc: ADMIN_EMAIL,
+          cc: adminEmail,
           subject: template.subject,
           html: template.html,
           emailType: 'REMINDER_RETRY',

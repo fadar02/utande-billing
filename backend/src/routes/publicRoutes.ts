@@ -70,7 +70,7 @@ router.post('/invoices/:id/pay', async (req: Request, res: Response) => {
     const balance = Number(invoice.total) - totalPaid;
     const payAmount = parseFloat(amount);
     if (isNaN(payAmount) || payAmount <= 0) return res.status(400).json({ error: 'Invalid payment amount' });
-    if (payAmount > balance) return res.status(400).json({ error: `Payment exceeds balance of $${balance.toFixed(2)}` });
+    if (payAmount > balance) return res.status(400).json({ error: `Payment exceeds balance of MWK ${balance.toFixed(2)}` });
 
     const lastPayment = await prisma.payment.findFirst({ orderBy: { createdAt: 'desc' } });
     let sequence = 1;
@@ -88,14 +88,19 @@ router.post('/invoices/:id/pay', async (req: Request, res: Response) => {
         amount: payAmount,
         paymentMethod: paymentMethod || 'CASH',
         reference: reference || null,
-        receivedById: 'a32d8809-7137-457f-8d87-d9025c22b868',
       },
     });
 
     const newTotalPaid = totalPaid + payAmount;
-    if (newTotalPaid >= Number(invoice.total)) {
-      await prisma.invoice.update({ where: { id }, data: { status: 'PAID', paidDate: new Date() } });
-    }
+    const newStatus = newTotalPaid >= Number(invoice.total) ? 'PAID' : 'PARTIALLY_PAID';
+    await prisma.invoice.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        amountPaid: newTotalPaid,
+        paidDate: newStatus === 'PAID' ? new Date() : null,
+      },
+    });
 
     res.status(201).json({ payment, message: 'Payment successful' });
   } catch (error: any) {

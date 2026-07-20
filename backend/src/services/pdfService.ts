@@ -78,8 +78,8 @@ export class PDFService {
         const y = doc.y;
         doc.text(item.description, itemMargin, y, { width: 280 });
         doc.text(item.quantity.toString(), itemMargin + 280, y, { width: 60, align: 'right' });
-        doc.text(`$${Number(item.unitPrice).toFixed(2)}`, itemMargin + 340, y, { width: 80, align: 'right' });
-        doc.text(`$${Number(item.amount).toFixed(2)}`, itemMargin + 420, y, { width: 80, align: 'right' });
+        doc.text(`MWK ${Number(item.unitPrice).toFixed(2)}`, itemMargin + 340, y, { width: 80, align: 'right' });
+        doc.text(`MWK ${Number(item.amount).toFixed(2)}`, itemMargin + 420, y, { width: 80, align: 'right' });
         doc.moveDown(0.8);
       }
 
@@ -90,29 +90,29 @@ export class PDFService {
       const totalsX = 380;
       doc.font('Helvetica-Bold');
       doc.text('Subtotal:', totalsX, doc.y, { width: 80, align: 'right' });
-      doc.text(`$${Number(invoice.subtotal).toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
+      doc.text(`MWK ${Number(invoice.subtotal).toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
       doc.moveDown(0.5);
 
       if (Number(invoice.taxRate) > 0) {
         doc.text(`Tax (${invoice.taxRate}%):`, totalsX, doc.y, { width: 80, align: 'right' });
-        doc.text(`$${Number(invoice.taxAmount).toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
+        doc.text(`MWK ${Number(invoice.taxAmount).toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
         doc.moveDown(0.5);
       }
 
       doc.fontSize(14).font('Helvetica-Bold');
       doc.text('Total:', totalsX, doc.y, { width: 80, align: 'right' });
-      doc.text(`$${Number(invoice.total).toFixed(2)}`, totalsX + 80, doc.y - 17, { width: 80, align: 'right' });
+      doc.text(`MWK ${Number(invoice.total).toFixed(2)}`, totalsX + 80, doc.y - 17, { width: 80, align: 'right' });
       doc.moveDown(0.5);
 
       doc.fontSize(10).font('Helvetica');
       doc.text('Amount Paid:', totalsX, doc.y, { width: 80, align: 'right' });
-      doc.text(`$${Number(invoice.amountPaid).toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
+      doc.text(`MWK ${Number(invoice.amountPaid).toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
       doc.moveDown(0.5);
 
       const balance = Number(invoice.total) - Number(invoice.amountPaid);
       doc.font('Helvetica-Bold');
       doc.text('Balance Due:', totalsX, doc.y, { width: 80, align: 'right' });
-      doc.text(`$${balance.toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
+      doc.text(`MWK ${balance.toFixed(2)}`, totalsX + 80, doc.y - 13, { width: 80, align: 'right' });
 
       // Notes
       if (invoice.notes) {
@@ -168,11 +168,11 @@ export class PDFService {
       doc.text(`Customer: ${payment.customer.firstName} ${payment.customer.lastName}`);
       doc.text(`Email: ${payment.customer.email}`);
       doc.text(`Phone: ${payment.customer.phone}`);
-      doc.text(`Amount: $${Number(payment.amount).toFixed(2)}`);
+      doc.text(`Amount: MWK ${Number(payment.amount).toFixed(2)}`);
       doc.text(`Payment Method: ${payment.paymentMethod}`);
       if (payment.reference) doc.text(`Reference: ${payment.reference}`);
       if (payment.invoice) doc.text(`Invoice: ${payment.invoice.invoiceNumber}`);
-      doc.text(`Received By: ${payment.receivedBy.firstName} ${payment.receivedBy.lastName}`);
+      doc.text(`Received By: ${payment.receivedBy ? `${payment.receivedBy.firstName} ${payment.receivedBy.lastName}` : 'System'}`);
       doc.moveDown(2);
 
       // Footer

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1064205569459",
+    "project_id": "ekhaya-live",
+    "storage_bucket": "ekhaya-live.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1064205569459:android:c368bb7f19e5f8bc374fc6",
+        "android_client_info": {
+          "package_name": "com.matchmalawi.matchmalawi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1064205569459-tfo7ped6nlv71ou1vp7fg2meoudfu66h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAG8RnIqoVs3HIZiB1uOi7dUM6nufmqmiY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1064205569459-tfo7ped6nlv71ou1vp7fg2meoudfu66h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1064205569459-v6m343bdnduau5kuqeolh94bul893t6t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.matchmalawi.matchmalawi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
