@@ -12,6 +12,14 @@ echo "=== Installing backend dependencies ==="
 cd ../backend
 npm install
 
+echo "=== Selecting Prisma schema for environment ==="
+if [ "$RENDER" = "true" ]; then
+  cp prisma/schema.postgres.prisma prisma/schema.prisma
+  echo "Using PostgreSQL schema"
+else
+  echo "Using SQLite schema"
+fi
+
 echo "=== Generating Prisma client ==="
 npx prisma generate
 
