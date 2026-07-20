@@ -5,13 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: '📊' },
   { path: '/customers', label: 'Customers', icon: '👥' },
-  { path: '/services', label: 'Packages', icon: '📦' },
   { path: '/invoices', label: 'Invoices', icon: '📄' },
-  { path: '/payments', label: 'Payments', icon: '💰' },
-  { path: '/reminders', label: 'Reminders', icon: '🔔' },
-  { path: '/reports', label: 'Reports', icon: '📈' },
   { path: '/settings', label: 'Settings', icon: '⚙️', roles: ['ADMIN', 'FINANCE'] },
-  { path: '/users', label: 'Users', icon: '👤', roles: ['ADMIN'] },
 ];
 
 export const Sidebar: React.FC = () => {

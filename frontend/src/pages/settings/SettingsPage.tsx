@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { settingsAPI } from '../../services/api';
 import { Card, Button, Input } from '../../components/ui';
 import { useSettings } from '../../context/SettingsContext';
+import { useAuth } from '../../context/AuthContext';
+import { PackagesPage } from '../services/PackagesPage';
+import { PaymentsPage } from '../payments/PaymentsPage';
+import { ReportsPage } from '../reports/ReportsPage';
+import { RemindersPage } from './RemindersPage';
+import { UsersPage } from './UsersPage';
 
 interface Setting {
   key: string;
@@ -13,7 +19,10 @@ interface Section {
   title: string;
   icon: string;
   description: string;
-  settings: { key: string; label: string; type: 'text' | 'number' | 'email' | 'toggle' | 'select'; options?: { value: string; label: string }[] }[];
+  roles?: string[];
+  type?: 'settings' | 'component';
+  component?: React.ReactNode;
+  settings?: { key: string; label: string; type: 'text' | 'number' | 'email' | 'toggle' | 'select'; options?: { value: string; label: string }[] }[];
 }
 
 const sections: Section[] = [
@@ -21,6 +30,7 @@ const sections: Section[] = [
     title: 'Company Information',
     icon: '🏢',
     description: 'Company details used across invoices, emails, and communications',
+    type: 'settings',
     settings: [
       { key: 'company_name', label: 'Company Name', type: 'text' },
       { key: 'company_email', label: 'Company Email', type: 'email' },
@@ -32,6 +42,7 @@ const sections: Section[] = [
     title: 'Currency & Tax',
     icon: '💱',
     description: 'Default currency and tax configuration for all invoices',
+    type: 'settings',
     settings: [
       { key: 'currency', label: 'Currency Code', type: 'select', options: [{ value: 'MWK', label: 'MWK — Malawian Kwacha' }] },
       { key: 'currency_symbol', label: 'Currency Symbol', type: 'text' },
@@ -43,6 +54,7 @@ const sections: Section[] = [
     title: 'Invoice Settings',
     icon: '📄',
     description: 'Defaults for invoice generation and numbering',
+    type: 'settings',
     settings: [
       { key: 'default_payment_terms', label: 'Default Payment Terms (days)', type: 'number' },
       { key: 'invoice_prefix', label: 'Invoice Number Prefix', type: 'text' },
@@ -58,6 +70,7 @@ const sections: Section[] = [
     title: 'Email Settings',
     icon: '📧',
     description: 'Email notification and SMTP configuration',
+    type: 'settings',
     settings: [
       { key: 'email_notifications_enabled', label: 'Enable Email Notifications', type: 'toggle' },
       { key: 'admin_email', label: 'Admin Email (CC on reminders)', type: 'email' },
@@ -67,10 +80,47 @@ const sections: Section[] = [
       { key: 'smtp_from_name', label: 'Email Sender Name', type: 'text' },
     ],
   },
+  {
+    title: 'Packages',
+    icon: '📦',
+    description: 'Manage service packages and pricing',
+    type: 'component',
+    component: <PackagesPage />,
+  },
+  {
+    title: 'Payments',
+    icon: '💰',
+    description: 'Record and view payments',
+    type: 'component',
+    component: <PaymentsPage />,
+  },
+  {
+    title: 'Reminders',
+    icon: '🔔',
+    description: 'View reminder logs and history',
+    type: 'component',
+    component: <RemindersPage />,
+  },
+  {
+    title: 'Reports',
+    icon: '📈',
+    description: 'View revenue, outstanding, and overdue reports',
+    type: 'component',
+    component: <ReportsPage />,
+  },
+  {
+    title: 'Users',
+    icon: '👤',
+    description: 'Manage system users and roles',
+    roles: ['ADMIN'],
+    type: 'component',
+    component: <UsersPage />,
+  },
 ];
 
 export const SettingsPage: React.FC = () => {
   const { reload } = useSettings();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [original, setOriginal] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -78,6 +128,11 @@ export const SettingsPage: React.FC = () => {
   const [saveMsg, setSaveMsg] = useState('');
   const [saveErr, setSaveErr] = useState('');
   const [activeTab, setActiveTab] = useState(0);
+
+  const visibleSections = sections.filter(s => {
+    if (s.roles && user) return s.roles.includes(user.role);
+    return true;
+  });
 
   useEffect(() => {
     settingsAPI.getAll().then(res => {
@@ -88,6 +143,10 @@ export const SettingsPage: React.FC = () => {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (activeTab >= visibleSections.length) setActiveTab(0);
+  }, [visibleSections.length, activeTab]);
 
   const handleChange = (key: string, value: string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -143,29 +202,32 @@ export const SettingsPage: React.FC = () => {
 
   if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#718096' }}>Loading settings...</div>;
 
-  const current = sections[activeTab];
+  const current = visibleSections[activeTab];
+  const isSettingsTab = current?.type === 'settings';
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <div>
-          <h1 style={{ margin: 0, color: '#2d3748' }}>System Settings</h1>
-          <p style={{ margin: '4px 0 0', color: '#718096', fontSize: '13px' }}>Configure system-wide settings. Changes apply to all users.</p>
+      {isSettingsTab && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h1 style={{ margin: 0, color: '#2d3748' }}>System Settings</h1>
+            <p style={{ margin: '4px 0 0', color: '#718096', fontSize: '13px' }}>Configure system-wide settings. Changes apply to all users.</p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button variant="secondary" onClick={handleReset}>Reset Defaults</Button>
+            <Button onClick={handleSave} disabled={!hasChanges || saving}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button variant="secondary" onClick={handleReset}>Reset Defaults</Button>
-          <Button onClick={handleSave} disabled={!hasChanges || saving}>
-            {saving ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </div>
-      </div>
+      )}
 
-      {saveMsg && (
+      {isSettingsTab && saveMsg && (
         <div style={{ padding: '10px 16px', backgroundColor: '#c6f6d5', color: '#22543d', borderRadius: '6px', marginBottom: '12px', fontSize: '13px' }}>
           {saveMsg}
         </div>
       )}
-      {saveErr && (
+      {isSettingsTab && saveErr && (
         <div style={{ padding: '10px 16px', backgroundColor: '#fed7d7', color: '#742a2a', borderRadius: '6px', marginBottom: '12px', fontSize: '13px' }}>
           {saveErr}
         </div>
@@ -175,7 +237,7 @@ export const SettingsPage: React.FC = () => {
         {/* Tabs */}
         <div style={{ width: '240px', flexShrink: 0 }}>
           <Card>
-            {sections.map((section, i) => (
+            {visibleSections.map((section, i) => (
               <button
                 key={i}
                 onClick={() => setActiveTab(i)}
@@ -202,74 +264,78 @@ export const SettingsPage: React.FC = () => {
 
         {/* Content */}
         <div style={{ flex: 1 }}>
-          <Card>
-            <div style={{ marginBottom: '20px' }}>
-              <h2 style={{ margin: 0, fontSize: '18px', color: '#2d3748', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>{current.icon}</span> {current.title}
-              </h2>
-              <p style={{ margin: '4px 0 0', color: '#718096', fontSize: '13px' }}>{current.description}</p>
-            </div>
+          {current.type === 'component' ? (
+            current.component
+          ) : (
+            <Card>
+              <div style={{ marginBottom: '20px' }}>
+                <h2 style={{ margin: 0, fontSize: '18px', color: '#2d3748', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>{current.icon}</span> {current.title}
+                </h2>
+                <p style={{ margin: '4px 0 0', color: '#718096', fontSize: '13px' }}>{current.description}</p>
+              </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {current.settings.map(s => (
-                <div key={s.key}>
-                  {s.type === 'toggle' ? (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f7fafc', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                      <div>
-                        <div style={{ fontSize: '14px', fontWeight: 500, color: '#2d3748' }}>{s.label}</div>
-                        <div style={{ fontSize: '12px', color: '#718096', marginTop: '2px' }}>
-                          Currently: <strong style={{ color: settings[s.key] === 'true' ? '#48bb78' : '#e53e3e' }}>
-                            {settings[s.key] === 'true' ? 'Enabled' : 'Disabled'}
-                          </strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {current.settings!.map(s => (
+                  <div key={s.key}>
+                    {s.type === 'toggle' ? (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f7fafc', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                        <div>
+                          <div style={{ fontSize: '14px', fontWeight: 500, color: '#2d3748' }}>{s.label}</div>
+                          <div style={{ fontSize: '12px', color: '#718096', marginTop: '2px' }}>
+                            Currently: <strong style={{ color: settings[s.key] === 'true' ? '#48bb78' : '#e53e3e' }}>
+                              {settings[s.key] === 'true' ? 'Enabled' : 'Disabled'}
+                            </strong>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => handleToggle(s.key)}
+                          style={{
+                            width: '48px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+                            backgroundColor: settings[s.key] === 'true' ? '#48bb78' : '#cbd5e0',
+                            position: 'relative', transition: 'background-color 0.2s',
+                          }}
+                        >
+                          <div style={{
+                            width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#fff',
+                            position: 'absolute', top: '2px',
+                            left: settings[s.key] === 'true' ? '26px' : '2px',
+                            transition: 'left 0.2s',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                          }} />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleToggle(s.key)}
-                        style={{
-                          width: '48px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-                          backgroundColor: settings[s.key] === 'true' ? '#48bb78' : '#cbd5e0',
-                          position: 'relative', transition: 'background-color 0.2s',
-                        }}
-                      >
-                        <div style={{
-                          width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#fff',
-                          position: 'absolute', top: '2px',
-                          left: settings[s.key] === 'true' ? '26px' : '2px',
-                          transition: 'left 0.2s',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                        }} />
-                      </button>
-                    </div>
-                  ) : s.type === 'select' ? (
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#4a5568', fontWeight: 500 }}>
-                        {s.label}
-                      </label>
-                      <select
+                    ) : s.type === 'select' ? (
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#4a5568', fontWeight: 500 }}>
+                          {s.label}
+                        </label>
+                        <select
+                          value={settings[s.key] || ''}
+                          onChange={e => handleChange(s.key, e.target.value)}
+                          style={{
+                            width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0',
+                            borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box',
+                            backgroundColor: settings[s.key] !== original[s.key] ? '#fffff0' : '#fff',
+                          }}
+                        >
+                          {s.options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                        </select>
+                      </div>
+                    ) : (
+                      <Input
+                        label={s.label}
+                        type={s.type}
                         value={settings[s.key] || ''}
                         onChange={e => handleChange(s.key, e.target.value)}
-                        style={{
-                          width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0',
-                          borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box',
-                          backgroundColor: settings[s.key] !== original[s.key] ? '#fffff0' : '#fff',
-                        }}
-                      >
-                        {s.options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                      </select>
-                    </div>
-                  ) : (
-                    <Input
-                      label={s.label}
-                      type={s.type}
-                      value={settings[s.key] || ''}
-                      onChange={e => handleChange(s.key, e.target.value)}
-                      style={settings[s.key] !== original[s.key] ? { backgroundColor: '#fffff0' } : undefined}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
+                        style={settings[s.key] !== original[s.key] ? { backgroundColor: '#fffff0' } : undefined}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </div>
