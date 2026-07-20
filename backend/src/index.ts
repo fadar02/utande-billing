@@ -84,6 +84,16 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 // Start server
 const start = async () => {
   try {
+    try {
+      const { execSync } = require('child_process');
+      const backendDir = path.resolve(__dirname, '..');
+      const prismaBin = path.join(backendDir, 'node_modules', '.bin', 'prisma');
+      execSync(`"${prismaBin}" db push --skip-generate --accept-data-loss`, { stdio: 'inherit', cwd: backendDir, timeout: 30000 });
+      logger.info('Database schema synced');
+    } catch (e: any) {
+      logger.error(`prisma db push failed: ${e.message}`);
+    }
+
     await prisma.$connect();
     logger.info('Database connected');
 
