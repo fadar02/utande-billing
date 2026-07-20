@@ -84,15 +84,6 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 // Start server
 const start = async () => {
   try {
-    try {
-      const { execSync } = require('child_process');
-      const schemaPath = path.join(__dirname, '../prisma/schema.prisma');
-      execSync(`npx prisma db push --schema="${schemaPath}" --skip-generate --accept-data-loss`, { stdio: 'inherit', cwd: __dirname });
-      logger.info('Database schema synced');
-    } catch (e: any) {
-      logger.error(`prisma db push failed: ${e.message}`);
-    }
-
     await prisma.$connect();
     logger.info('Database connected');
 
@@ -100,11 +91,6 @@ const start = async () => {
 
     app.listen(config.port, () => {
       logger.info(`Utande Billing API running on port ${config.port}`);
-      console.log(`\n  Utande Smart Billing System API`);
-      console.log(`  ================================`);
-      console.log(`  URL:      http://localhost:${config.port}`);
-      console.log(`  Health:   http://localhost:${config.port}/api/health`);
-      console.log(`  API Base: http://localhost:${config.port}/api\n`);
     });
   } catch (error: any) {
     logger.error(`Failed to start server: ${error.message}`);
