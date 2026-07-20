@@ -175,7 +175,7 @@ export const CustomersPage: React.FC = () => {
                   <td colSpan={8} style={{ padding: '0 16px 12px', backgroundColor: '#f7fafc' }}>
                     <div style={{ padding: '12px', borderRadius: '6px' }}>
                       <div style={{ fontSize: '13px', fontWeight: 600, color: '#2d3748', marginBottom: '8px' }}>
-                        Packages
+                Package
                       </div>
                       {c.services && c.services.length > 0 ? (
                         <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
@@ -236,29 +236,35 @@ export const CustomersPage: React.FC = () => {
           <Input label="Phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
           <Input label="Notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
 
-          {!editCustomer && services.length > 0 && (
+          {!editCustomer && (
             <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', color: '#4a5568', fontWeight: 500 }}>
-                Packages & Services
+                Package
               </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '8px', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
-                {services.map(s => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => toggleService(s.id)}
-                    style={{
-                      padding: '6px 12px', borderRadius: '4px', border: '1px solid',
-                      cursor: 'pointer', fontSize: '13px',
-                      backgroundColor: selectedServiceIds.includes(s.id) ? '#3182ce' : '#fff',
-                      color: selectedServiceIds.includes(s.id) ? '#fff' : '#4a5568',
-                      borderColor: selectedServiceIds.includes(s.id) ? '#3182ce' : '#e2e8f0',
-                    }}
-                  >
-                    {s.name}
-                  </button>
-                ))}
-              </div>
+              {services.length > 0 ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '8px', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+                  {services.map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => toggleService(s.id)}
+                      style={{
+                        padding: '6px 12px', borderRadius: '4px', border: '1px solid',
+                        cursor: 'pointer', fontSize: '13px',
+                        backgroundColor: selectedServiceIds.includes(s.id) ? '#3182ce' : '#fff',
+                        color: selectedServiceIds.includes(s.id) ? '#fff' : '#4a5568',
+                        borderColor: selectedServiceIds.includes(s.id) ? '#3182ce' : '#e2e8f0',
+                      }}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ padding: '8px', color: '#a0aec0', fontSize: '13px', fontStyle: 'italic' }}>
+                  No packages available. Create one in Settings.
+                </div>
+              )}
             </div>
           )}
 

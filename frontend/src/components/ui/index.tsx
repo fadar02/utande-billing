@@ -66,7 +66,7 @@ export const Input: React.FC<{
       {label} {required && <span style={{ color: '#e53e3e' }}>*</span>}
     </label>
     <input
-      type={type} value={value} onChange={onChange} placeholder={placeholder} min={min}
+      type={type} value={value} onChange={onChange} placeholder={placeholder} min={min} required={required}
       style={{
         width: '100%', padding: '8px 12px', border: `1px solid ${error ? '#e53e3e' : '#e2e8f0'}`,
         borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', ...style,
