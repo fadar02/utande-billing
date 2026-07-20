@@ -6,7 +6,7 @@ cd frontend
 npm install
 
 echo "=== Building frontend ==="
-npm run build
+npx vite build
 
 echo "=== Installing backend dependencies ==="
 cd ../backend
@@ -15,10 +15,7 @@ npm install
 echo "=== Generating Prisma client ==="
 npx prisma generate
 
-echo "=== Pushing database schema ==="
-npx prisma db push --skip-generate --accept-data-loss
-
-echo "=== Compiling TypeScript ==="
-npx tsc
+echo "=== Compiling TypeScript (fast) ==="
+./node_modules/.bin/tsc --declaration false --declarationMap false --sourceMap false --outDir dist
 
 echo "=== Build complete ==="
