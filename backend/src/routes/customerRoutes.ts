@@ -12,6 +12,7 @@ const customerSchema = z.object({
   email: z.string().email(),
   phone: z.string().min(1),
   notes: z.string().optional(),
+  serviceIds: z.array(z.string().uuid()).optional(),
 });
 
 const sendEmailSchema = z.object({
