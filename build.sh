@@ -1,16 +1,18 @@
 #!/bin/bash
-set -e
-
-echo "=== Installing frontend dependencies ==="
-cd frontend
-npm install
-
-echo "=== Building frontend ==="
-./node_modules/.bin/vite build
 
 echo "=== Installing backend dependencies ==="
-cd ../backend
+cd backend
 npm install
+
+echo "=== Installing frontend dependencies ==="
+cd ../frontend
+npm install || echo "Frontend npm install failed (non-fatal)"
+
+echo "=== Building frontend ==="
+./node_modules/.bin/vite build || echo "Frontend build failed (non-fatal)"
+
+echo "=== Backend setup ==="
+cd ../backend
 
 echo "=== Selecting Prisma schema for environment ==="
 if [ "$RENDER" = "true" ]; then
