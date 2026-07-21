@@ -2,27 +2,27 @@ import { config } from '../config';
 import prisma from '../config/database';
 import logger from '../utils/logger';
 
-const sendViaResend = async (to: string, subject: string, html: string, cc?: string): Promise<void> => {
-  const recipients: any[] = [{ email: to }];
-  if (cc) recipients.push({ email: cc });
+const sendViaSendGrid = async (to: string, subject: string, html: string, cc?: string): Promise<void> => {
+  const personalization: any = { to: [{ email: to }] };
+  if (cc) personalization.cc = [{ email: cc }];
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${config.smtp.pass}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Utande Billing <onboarding@resend.dev>',
-      to: recipients.map(r => r.email),
+      personalizations: [personalization],
+      from: { email: 'bwailacesc@gmail.com', name: 'Utande Billing' },
       subject,
-      html,
+      content: [{ type: 'text/html', value: html }],
     }),
   });
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Resend API error ${res.status}: ${body}`);
+    throw new Error(`SendGrid API error ${res.status}: ${body}`);
   }
 };
 
@@ -48,7 +48,7 @@ export const sendEmail = async (params: SendEmailParams): Promise<boolean> => {
   });
 
   try {
-    await sendViaResend(params.to, params.subject, params.html, params.cc);
+    await sendViaSendGrid(params.to, params.subject, params.html, params.cc);
 
     await prisma.emailLog.update({
       where: { id: emailLog.id },
@@ -82,7 +82,7 @@ export const retryFailedEmails = async (): Promise<void> => {
 
   for (const email of failedEmails) {
     try {
-      await sendViaResend(email.recipientEmail, email.subject, email.body);
+      await sendViaSendGrid(email.recipientEmail, email.subject, email.body);
 
       await prisma.emailLog.update({
         where: { id: email.id },

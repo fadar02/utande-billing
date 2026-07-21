@@ -1,6 +1,7 @@
 {
   "name": "utande-smart-billing-backend",
   "version": "1.0.0",
+  "engines": { "node": ">=18.0.0" },
   "description": "Utande Smart Billing System - Backend API",
   "main": "dist/index.js",
   "scripts": {
