@@ -15,9 +15,9 @@ function getTransporter(): nodemailer.Transporter {
         user: config.smtp.user,
         pass: config.smtp.pass,
       },
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
+      connectionTimeout: 30000,
+      greetingTimeout: 30000,
+      socketTimeout: 45000,
     });
   }
   return transporter;
