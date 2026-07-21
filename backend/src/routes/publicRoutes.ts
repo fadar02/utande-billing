@@ -1,30 +1,7 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../config/database';
-import { config } from '../config';
 
 const router = Router();
-
-router.get('/test-resend', async (_req: Request, res: Response) => {
-  try {
-    const result = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${config.smtp.pass}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Utande Billing <onboarding@resend.dev>',
-        to: ['bwailacesc@gmail.com'],
-        subject: 'Test from server',
-        html: '<p>test</p>',
-      }),
-    });
-    const body = await result.text();
-    res.json({ status: result.status, body, keyPrefix: config.smtp.pass.substring(0, 6) + '...' });
-  } catch (e: any) {
-    res.json({ error: e.message, stack: e.stack?.split('\n').slice(0, 3).join('\n') });
-  }
-});
 
 router.get('/invoices/:id', async (req: Request, res: Response) => {
   try {
