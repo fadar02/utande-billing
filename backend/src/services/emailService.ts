@@ -1,30 +1,27 @@
+import nodemailer from 'nodemailer';
 import { config } from '../config';
 import prisma from '../config/database';
 import logger from '../utils/logger';
 
-const sendViaSendGrid = async (to: string, subject: string, html: string, cc?: string): Promise<void> => {
-  const personalization: any = { to: [{ email: to }] };
-  if (cc) personalization.cc = [{ email: cc }];
+let transporter: nodemailer.Transporter | null = null;
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${config.smtp.pass}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      personalizations: [personalization],
-      from: { email: 'bwailacesc@gmail.com', name: 'Utande Billing' },
-      subject,
-      content: [{ type: 'text/html', value: html }],
-    }),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`SendGrid API error ${res.status}: ${body}`);
+function getTransporter(): nodemailer.Transporter {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: config.smtp.host,
+      port: config.smtp.port,
+      secure: config.smtp.port === 465,
+      auth: {
+        user: config.smtp.user,
+        pass: config.smtp.pass,
+      },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+    });
   }
-};
+  return transporter;
+}
 
 interface SendEmailParams {
   to: string;
@@ -48,7 +45,13 @@ export const sendEmail = async (params: SendEmailParams): Promise<boolean> => {
   });
 
   try {
-    await sendViaSendGrid(params.to, params.subject, params.html, params.cc);
+    await getTransporter().sendMail({
+      from: config.smtp.from,
+      to: params.to,
+      cc: params.cc,
+      subject: params.subject,
+      html: params.html,
+    });
 
     await prisma.emailLog.update({
       where: { id: emailLog.id },
@@ -82,7 +85,12 @@ export const retryFailedEmails = async (): Promise<void> => {
 
   for (const email of failedEmails) {
     try {
-      await sendViaSendGrid(email.recipientEmail, email.subject, email.body);
+      await getTransporter().sendMail({
+        from: config.smtp.from,
+        to: email.recipientEmail,
+        subject: email.subject,
+        html: email.body,
+      });
 
       await prisma.emailLog.update({
         where: { id: email.id },
