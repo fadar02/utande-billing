@@ -3,10 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+// ─── User & Auth ────────────────────────────────────────────────
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -25,6 +26,7 @@ model User {
   @@map("users")
 }
 
+// ─── Customer ───────────────────────────────────────────────────
 model Customer {
   id            String    @id @default(uuid())
   customerCode  String    @unique @map("customer_code")
@@ -47,6 +49,7 @@ model Customer {
   @@map("customers")
 }
 
+// ─── Service ────────────────────────────────────────────────────
 model Service {
   id            String    @id @default(uuid())
   name          String
@@ -85,6 +88,7 @@ model CustomerService {
   @@map("customer_services")
 }
 
+// ─── Invoice ────────────────────────────────────────────────────
 model Invoice {
   id              String    @id @default(uuid())
   invoiceNumber   String    @unique @map("invoice_number")
@@ -132,6 +136,7 @@ model InvoiceItem {
   @@map("invoice_items")
 }
 
+// ─── Payment ────────────────────────────────────────────────────
 model Payment {
   id              String    @id @default(uuid())
   paymentNumber   String    @unique @map("payment_number")
@@ -156,6 +161,7 @@ model Payment {
   @@map("payments")
 }
 
+// ─── Reminders ──────────────────────────────────────────────────
 model ReminderLog {
   id              String    @id @default(uuid())
   invoiceId       String    @map("invoice_id")
@@ -195,6 +201,7 @@ model ReminderConfig {
   @@map("reminder_configs")
 }
 
+// ─── Email Logs ─────────────────────────────────────────────────
 model EmailLog {
   id            String    @id @default(uuid())
   recipientEmail String   @map("recipient_email")
@@ -214,6 +221,7 @@ model EmailLog {
   @@map("email_logs")
 }
 
+// ─── Audit ──────────────────────────────────────────────────────
 model AuditLog {
   id          String    @id @default(uuid())
   userId      String?   @map("user_id")
@@ -233,6 +241,7 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+// ─── System Settings ────────────────────────────────────────────
 model SystemSetting {
   id          String   @id @default(uuid())
   key         String   @unique
