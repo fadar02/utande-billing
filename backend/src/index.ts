@@ -52,6 +52,16 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reminders', reminderRoutes);
 app.use('/api/settings', settingsRoutes);
 
+// Debug: email log viewer
+app.get('/api/debug/email-logs', async (_req, res) => {
+  try {
+    const logs = await prisma.emailLog.findMany({ orderBy: { createdAt: 'desc' }, take: 10 });
+    res.json(logs);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Health check
 app.get('/api/health', async (_req, res) => {
   try {
